@@ -367,11 +367,18 @@ creating your presentation and report easier. Please note that you
 project.</p>
 <pre class="r"><code>library(tidyverse)
 # Add any other libraries here</code></pre>
-<pre class="r"><code># load your data 
-setwd(&quot;~/IDS/GroupProject/data/census+income&quot;)
+<pre class="r"><code>setwd(&quot;~/IDS/GroupProject/data/census+income&quot;)
 adult_data &lt;- read.csv(&quot;adult.data&quot;)
 adult_test &lt;- read.csv(&quot;adult.csv&quot;)
-oldadult_names &lt;- read.csv(&quot;old.adult.names&quot;)</code></pre>
+oldadult_names &lt;- read.csv(&quot;old.adult.names&quot;)
+
+#Changing some of the variable names 
+colnames(adult_data) &lt;- c(&quot;age&quot;, &quot;employment type&quot;, &quot;remove1&quot;, &quot;degree type&quot;, &quot;remove2&quot;, &quot;marital status&quot;, &quot;profession&quot;, &quot;family-position&quot;, &quot;race&quot;, &quot;gender&quot;, &quot;remove3&quot;, &quot;remove4&quot;, &quot;remove5&quot;, &quot;nationality&quot;, &quot;income&quot;)
+
+#Removing irrelevant data
+adult_data &lt;- adult_data %&gt;% select(-remove1,-remove2,-remove3,-remove4,-remove5)
+
+view(adult_data)</code></pre>
 
 
 

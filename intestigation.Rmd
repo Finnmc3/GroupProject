@@ -24,14 +24,18 @@ library(tidyverse)
 
 
 ```{r load-data}
-# load your data 
 setwd("~/IDS/GroupProject/data/census+income")
 adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 oldadult_names <- read.csv("old.adult.names")
 
+#Changing some of the variable names 
+colnames(adult_data) <- c("age", "employment type", "remove1", "degree type", "remove2", "marital status", "profession", "family-position", "race", "gender", "remove3", "remove4", "remove5", "nationality", "income")
 
+#Removing irrelevant data
+adult_data <- adult_data %>% select(-remove1,-remove2,-remove3,-remove4,-remove5)
 
+view(adult_data)
 
 
 
