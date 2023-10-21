@@ -27,17 +27,16 @@ library(tidyverse)
 setwd("~/IDS/GroupProject/data/census+income")
 adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
-oldadult_names <- read.csv("old.adult.names")
 
-#Changing some of the variable names 
-colnames(adult_data) <- c("age", "employment type", "remove1", "degree type", "remove2", "marital status", "profession", "family-position", "race", "gender", "remove3", "remove4", "remove5", "nationality", "income")
+#Changing the variable names for adult data
+colnames(adult_data) <- c("age", "workclass", "fnlwgt", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-weed", "native-country", "class")
 
-#Removing irrelevant data
-adult_data <- adult_data %>% select(-remove1,-remove2,-remove3,-remove4,-remove5)
+
+#note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
 view(adult_data)
 
-
+#some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 
 ```
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="by Team31: Finn, Tom, User3, User4 &amp; User5" />
 
-<meta name="date" content="2023-10-20" />
+<meta name="date" content="2023-10-21" />
 
 <title>IDS investigation worksheet</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">IDS investigation worksheet</h1>
 <h4 class="author">by Team31: Finn, Tom, User3, User4 &amp; User5</h4>
-<h4 class="date">2023-10-20</h4>
+<h4 class="date">2023-10-21</h4>
 
 </div>
 
@@ -370,15 +370,16 @@ project.</p>
 <pre class="r"><code>setwd(&quot;~/IDS/GroupProject/data/census+income&quot;)
 adult_data &lt;- read.csv(&quot;adult.data&quot;)
 adult_test &lt;- read.csv(&quot;adult.csv&quot;)
-oldadult_names &lt;- read.csv(&quot;old.adult.names&quot;)
 
-#Changing some of the variable names 
-colnames(adult_data) &lt;- c(&quot;age&quot;, &quot;employment type&quot;, &quot;remove1&quot;, &quot;degree type&quot;, &quot;remove2&quot;, &quot;marital status&quot;, &quot;profession&quot;, &quot;family-position&quot;, &quot;race&quot;, &quot;gender&quot;, &quot;remove3&quot;, &quot;remove4&quot;, &quot;remove5&quot;, &quot;nationality&quot;, &quot;income&quot;)
+#Changing the variable names for adult data
+colnames(adult_data) &lt;- c(&quot;age&quot;, &quot;workclass&quot;, &quot;fnlwgt&quot;, &quot;education&quot;, &quot;education-num&quot;, &quot;marital-status&quot;, &quot;occupation&quot;, &quot;relationship&quot;, &quot;race&quot;, &quot;sex&quot;, &quot;capital-gain&quot;, &quot;capital-loss&quot;, &quot;hours-per-weed&quot;, &quot;native-country&quot;, &quot;class&quot;)
 
-#Removing irrelevant data
-adult_data &lt;- adult_data %&gt;% select(-remove1,-remove2,-remove3,-remove4,-remove5)
 
-view(adult_data)</code></pre>
+#note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
+
+view(adult_data)
+
+#some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.</code></pre>
 
 
 
