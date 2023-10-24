@@ -37,6 +37,20 @@ colnames(adult_data) <- c("age", "workclass", "fnlwgt", "education", "education-
 view(adult_data)
 
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
+education_counts <- adult_data %>%
+  group_by(education) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+adult_data$education <- adult_data$education %>% factor(levels = education_counts$education)
+
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class)) + coord_flip()
+
+#from this graph it looks as if bachelors degrees hve the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
+
+
+
+
 
 ```
 
