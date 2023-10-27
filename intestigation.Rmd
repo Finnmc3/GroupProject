@@ -29,7 +29,7 @@ adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "fnlwgt", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-weed", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-week", "native-country", "class")
 
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
@@ -44,10 +44,9 @@ education_counts <- adult_data %>%
 
 adult_data$education <- adult_data$education %>% factor(levels = education_counts$education)
 
-adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class)) + coord_flip()
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
-
 
 
 
