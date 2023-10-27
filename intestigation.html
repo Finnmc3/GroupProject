@@ -372,12 +372,16 @@ adult_data &lt;- read.csv(&quot;adult.data&quot;)
 adult_test &lt;- read.csv(&quot;adult.csv&quot;)
 
 #Changing the variable names for adult data
-colnames(adult_data) &lt;- c(&quot;age&quot;, &quot;workclass&quot;, &quot;id&quot;, &quot;education&quot;, &quot;education-num&quot;, &quot;marital-status&quot;, &quot;occupation&quot;, &quot;relationship&quot;, &quot;race&quot;, &quot;sex&quot;, &quot;capital-gain&quot;, &quot;capital-loss&quot;, &quot;hours-per-week&quot;, &quot;native-country&quot;, &quot;class&quot;)
+colnames(adult_data) &lt;- c(&quot;age&quot;, &quot;workclass&quot;, &quot;id&quot;, &quot;education&quot;, &quot;education-num&quot;, &quot;marital-status&quot;, &quot;occupation&quot;, &quot;relationship&quot;, &quot;race&quot;, &quot;sex&quot;, &quot;capital_gain&quot;, &quot;capital_loss&quot;, &quot;hours-per-week&quot;, &quot;native-country&quot;, &quot;class&quot;)
+
+adult_data_new &lt;- adult_data %&gt;% 
+  select(-capital_gain, -capital_loss)
+
 
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
-view(adult_data)
+view(adult_data_new)
 
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 education_counts &lt;- adult_data %&gt;%

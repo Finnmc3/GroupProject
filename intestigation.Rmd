@@ -29,12 +29,16 @@ adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-week", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+
+adult_data_new <- adult_data %>% 
+  select(-capital_gain, -capital_loss)
+
 
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
-view(adult_data)
+view(adult_data_new)
 
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 education_counts <- adult_data %>%
@@ -47,6 +51,7 @@ adult_data$education <- adult_data$education %>% factor(levels = education_count
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
+
 
 
 
