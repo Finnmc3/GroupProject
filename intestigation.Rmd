@@ -31,14 +31,14 @@ adult_test <- read.csv("adult.csv")
 #Changing the variable names for adult data
 colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
 
-adult_data_new <- adult_data %>% 
+adult_data <- adult_data %>% 
   select(-capital_gain, -capital_loss)
 
 
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
-view(adult_data_new)
+view(adult_data)
 
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 education_counts <- adult_data %>%
@@ -90,5 +90,22 @@ percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill 
 
 print(percentage_sex)
 ```
+#Here we have created a program which predicts a persons class based on the other variable.
+#The program is made using conditional probabilities so we can compare this model to that of a linear regression once we make a linear regression model.
 
+conditional_probs <- with(adult_data, prop.table(table(class, race, sex, education, native-country), margin = 1))
 
+#please put a space before enetering each value and also use capitals at start
+new_individual <- data.frame(race = " White", sex = " Male", education = " Bachelors", native-country = "")
+
+# Calculate the conditional probabilities for both classes
+conditional_probs_above_50K <- conditional_probs[" >50K", new_individual$race, new_individual$sex, new_individual$education]
+conditional_probs_below_50K <- conditional_probs[" <=50K", new_individual$race, new_individual$sex, new_individual$education]
+
+# Compare the conditional probabilities and classify the individual
+if (conditional_probs_above_50K > conditional_probs_below_50K) {
+  prediction <- " >50K"
+} else {
+  prediction <- " <=50K"
+}
+prediction
