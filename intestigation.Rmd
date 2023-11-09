@@ -93,10 +93,10 @@ print(percentage_sex)
 #Here we have created a program which predicts a persons class based on the other variable.
 #The program is made using conditional probabilities so we can compare this model to that of a linear regression once we make a linear regression model.
 
-conditional_probs <- with(adult_data, prop.table(table(class, race, sex, education, native-country), margin = 1))
+conditional_probs <- with(adult_data, prop.table(table(class, race, sex, education), margin = 1))
 
 #please put a space before enetering each value and also use capitals at start
-new_individual <- data.frame(race = " White", sex = " Male", education = " Bachelors", native-country = "")
+new_individual <- data.frame(race = " Black", sex = " Male", education = " Bachelors")
 
 # Calculate the conditional probabilities for both classes
 conditional_probs_above_50K <- conditional_probs[" >50K", new_individual$race, new_individual$sex, new_individual$education]
@@ -104,8 +104,14 @@ conditional_probs_below_50K <- conditional_probs[" <=50K", new_individual$race, 
 
 # Compare the conditional probabilities and classify the individual
 if (conditional_probs_above_50K > conditional_probs_below_50K) {
-  prediction <- " >50K"
+  result = paste("class is >50K With probability", conditional_probs_above_50K, sep = " ")
+  print(result)
+
 } else {
-  prediction <- " <=50K"
+  result = paste("Class is <= 50K With probability", condition_probs_below_50K, sep = " ")
+  print(result)
 }
-prediction
+
+
+
+
