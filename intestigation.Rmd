@@ -1,6 +1,6 @@
 ---
 title: "IDS investigation worksheet"
-author: "by Team31: Finn, Tom, User3, User4 & User5"
+author: "by Team31: Finn, Tom, Jon, Scott & Roman"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -40,6 +40,9 @@ adult_data <- adult_data %>%
 
 view(adult_data)
 
+```
+
+```{r plot degree vs class}
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 education_counts <- adult_data %>%
   group_by(education) %>%
@@ -51,7 +54,9 @@ adult_data$education <- adult_data$education %>% factor(levels = education_count
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
+```
 
+```{r plot income vs race}
 
 #graph displaying income against race
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -72,11 +77,15 @@ percentage_race <- ggplot(percentage_race_data, aes(x = race, y = percentage, fi
 print(percentage_race)
 #graph showing income against sex
 
+```
 
+```{r plot sex vs class}
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+```
 
+```{r plot sex vs class as percentage}
 percentage_sex_data <- adult_data %>%
   group_by(sex, class) %>%
   summarize(count = n()) %>%
@@ -90,13 +99,14 @@ percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill 
 
 print(percentage_sex)
 ```
+```{r program to determine income}
 #Here we have created a program which predicts a persons class based on the other variable.
 #The program is made using conditional probabilities so we can compare this model to that of a linear regression once we make a linear regression model.
 
 conditional_probs <- with(adult_data, prop.table(table(class, race, sex, education), margin = 1))
 
 #please put a space before enetering each value and also use capitals at start
-new_individual <- data.frame(race = " Black", sex = " Male", education = " Bachelors")
+new_individual <- data.frame(race = " White", sex = " Male", education = " Bachelors")
 
 # Calculate the conditional probabilities for both classes
 conditional_probs_above_50K <- conditional_probs[" >50K", new_individual$race, new_individual$sex, new_individual$education]
@@ -108,10 +118,10 @@ if (conditional_probs_above_50K > conditional_probs_below_50K) {
   print(result)
 
 } else {
-  result = paste("Class is <= 50K With probability", condition_probs_below_50K, sep = " ")
+  result = paste("Class is <= 50K With probability", conditional_probs_below_50K, sep = " ")
   print(result)
 }
-
+```
 
 
 

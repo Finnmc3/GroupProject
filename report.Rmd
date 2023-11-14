@@ -36,6 +36,8 @@ colnames(adult_data) <- c("age", "workclass", "fnlwgt", "education", "education-
 ##notes
 all ages are above 16
 
+remember to make diagnostics plots for any linear models
+
 take into account the type of people who will have taken part in the census
 The data was taken in 1994 
  
@@ -43,15 +45,15 @@ we can make a prediction algorith to determines someones class based on all of t
 
 ## Research Question
 
-Describe your research question here. Include why this question might be of interest. 
-
 Investigating variables that affect income from a data set of 33000 individuals from a UCLA student.
-
 
 
 ## Data
 
 Briefly describe your dataset here - include a description of the key variables you will be investigating. 
+
+A Census of 3300 people taken in 1994 that includes information on peoples age, race, sex,native-country , class, etc.
+
 Include a citation for your data. 
 See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on proper citation for datasets. 
 If you got your data off the web, make sure to state the retrieval date.
