@@ -29,12 +29,16 @@ adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
 
 adult_data <- adult_data %>% 
   select(-capital_gain, -capital_loss)
 
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white <- function(x){ifelse(x == " White", 1, 0)}
 
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+adult_data <- adult_data %>% select(-race_old)
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
@@ -123,5 +127,14 @@ if (conditional_probs_above_50K > conditional_probs_below_50K) {
 }
 ```
 
+``` {r creating a logistic regression }
 
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ race + sex, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
 

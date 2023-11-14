@@ -1,7 +1,7 @@
 ---
 title: "Income Inequality"
-subtitle: "Determining income class based on certain variables"
-author: "The best team <br> Finn, Tom, Jon, Scott, Roman"
+subtitle: "Looking at income Inequality and determining income class based on identity variabes"
+author: "The Best Team <br> Finn, Tom, Jon, Scott, Roman"
 institute: "University of Edinburgh"
 date: "`r Sys.Date()`"
 output:
@@ -39,7 +39,16 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
-# Load your data here
+
+setwd("~/IDS/GroupProject/data/census+income")
+adult_data <- read.csv("adult.data")
+adult_test <- read.csv("adult.csv")
+
+#Changing the variable names for adult data
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+
+adult_data <- adult_data %>% 
+  select(-capital_gain, -capital_loss)
 
 ```
 
@@ -53,22 +62,37 @@ style_xaringan(
 
 class: center, middle
 
-## A statement of the overall goal / research question
+## Reasearching income inequality
+
+By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear discrepancies between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
 
 ---
 
 class: inverse, center, middle
 
-# Section title
+#Visualization of our key data points
 
 ---
 
-# Hello World
+# Gender vs class
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of females. ]
+.pull-right[]
+```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
+# see how I changed out.width and fig.width from defaults
+# to make the figure bigger
+percentage_sex_data <- adult_data %>%
+  group_by(sex, class) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100)
 
-- Click the `Knit` button to compile your presentation
 
-- Make sure to commit and push all resulting files to your GitHub repo
+percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+percentage_sex
+```
 ---
 
 class: inverse, middle, center

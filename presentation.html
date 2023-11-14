@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Looking at factors which determine class</title>
+    <title>Income Inequality</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Team name   Names of team members" />
+    <meta name="author" content="The Best Team   Finn, Tom, Jon, Scott, Roman" />
     <meta name="date" content="2023-11-14" />
     <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
@@ -13,13 +13,13 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# Looking at factors which determine class
+# Income Inequality
 ]
 .subtitle[
-## Presentation subtitle (if any)
+## Looking at income Inequality and determining income class based on identity variabes
 ]
 .author[
-### Team name <br> Names of team members
+### The Best Team <br> Finn, Tom, Jon, Scott, Roman
 ]
 .institute[
 ### University of Edinburgh
@@ -44,22 +44,28 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
-## A statement of the overall goal / research question
+## Reasearching income inequality
+
+By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear discrepancies between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
 
 ---
 
 class: inverse, center, middle
 
-# Section title
+#Visualization of our key data points
 
 ---
 
-# Hello World
+# Gender vs class
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of females. ]
+.pull-right[]
 
-- Click the `Knit` button to compile your presentation
+```
+## `summarise()` has grouped output by 'sex'. You can override using the `.groups`
+## argument.
+```
 
-- Make sure to commit and push all resulting files to your GitHub repo
-
+&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="50%" /&gt;
 ---
 
 class: inverse, middle, center
@@ -146,7 +152,7 @@ glance(model)
 - goes here
 ]
 .pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
 ]
 
 ---
