@@ -1,7 +1,7 @@
 ---
-title: "Looking at factors which determine class"
-subtitle: "Presentation subtitle (if any)"
-author: "Team name <br> Names of team members"
+title: "Income Inequality"
+subtitle: "Determining income class based on certain variables"
+author: "The best team <br> Finn, Tom, Jon, Scott, Roman"
 institute: "University of Edinburgh"
 date: "`r Sys.Date()`"
 output:
