@@ -43,20 +43,16 @@ The data was taken in 1994
  
 we can make a prediction algorith to determines someones class based on all of the other data 
 
+What we have quantified in this section is alarming and disturbing. However, one aspect that makes this racism so difficult to address is that the experiment, as well-designed as it is, cannot send us much signal about which employers are discriminating. It is only possible to say that discrimination is happening, even if we cannot say which particular callbacks — or non-callbacks — represent discrimination. Finding strong evidence of racism for individual cases is a persistent challenge in enforcing anti-discrimination laws.
+
 ## Research Question
 
-Investigating variables that affect income from a data set of 33000 individuals from a UCLA student.
+Investigating variables that affect income from a data set of 33000 individuals from a UCLA census.
 
 
 ## Data
 
-Briefly describe your dataset here - include a description of the key variables you will be investigating. 
-
-A Census of 3300 people taken in 1994 that includes information on peoples age, race, sex,native-country , class, etc.
-
-Include a citation for your data. 
-See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on proper citation for datasets. 
-If you got your data off the web, make sure to state the retrieval date.
+A Census of 3300 people taken in 1994 that includes information on adults(over 16's): age, race, sex,native-country , class, etc.
 
 archive.ics.uci.edu/dataset/20/census+income a 
 
@@ -67,28 +63,28 @@ archive.ics.uci.edu/dataset/20/census+income a
 
 ## Findings
 
-The write-up of your project and findings go here. 
 
-Think of this as the text of your presentation with some extra detail to cover what there was not time to discuss in the presentation. This might include any assumptions you made when doing your analysis, any limitations of the work you have done or any ideas you have for future work. Feel free to split this section into subsections to make it easier to read. 
+-Introduction:
 
-The length should be roughly 1,500 words. 
-If you want to use a word count addin, you can install this by copying and pasting the following into RStudio:
+The primary objective of our data science project is to develop a robust predictive model capable of estimating an individual's income based on several key parameters: race, having a degree, gender, workclass, age, marital status, occupation, relationship status, capital gain, capital loss, hours per week, native country, and income (categorized as above or below 50k annually). This predictive model aims to provide an accurate estimation of income levels by leveraging these key factors.
 
-`devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)`
+For our investigation, we have selected the "adult" dataset from the UC Irvine Machine Learning Repository. This dataset comprises over 33 thousand entries and includes 13 distinct variables. We have chosen this dataset due to its credibility and richness in variables, expecting it to serve as a reliable foundation for our analysis and model development.
 
-You will then need to restart RStudio. Once you have done that, select the text you want to count the words of, go to Addins, and select the `Word count` addin.
-This addin counts words using two different algorithms, but the results should be similar and as long as you're in the ballpark of 1,500 words, you're good! 
-The addin will ignore code chunks and only count the words in prose. If you don't want to use the addin you can always copy and paste the text into Microsoft Word to do a Word Count!
+It's crucial to note that the data we're working with originates from a census conducted in 1994 and only considers adults over the age of 16. While this dataset offers substantial insights, the temporal and age gap might introduce challenges due to potential changes in societal, economic, and cultural factors over time. We will address and mitigate these potential limitations as part of our analysis process.
 
-You can also load your data here and present any analysis results / plots.
-Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
+Through this report, we aim to explore, analyze, and build predictive models that effectively estimate an individual's income based on the provided variables. Our ultimate goal is to develop an accurate predictor while acknowledging and accounting for any potential biases or limitations introduced by the dataset's age.
 
 
+-First steps:
+Our first steps of the project were mainly looking at the data and getting a feel for how we would go about elaborating the predictor. We started off by doing some simple wrangling where we eliminated some NA values from the the dataset as well as eliminating some variables like capital gain and capital loss as it represents the amount of money won or lost in assets (mainly stocks and shares by each member , something we thought would not be important as the majority of people have a very small pool of assets. Also after looking at the data both of these columns had virtually all values of zero so we decided to be selective of unnecessary data such as this. Furthermore, we also changed the name of the column previously called fnlwgt to ID where we reached a point where we were happy with our data and had a clear and organised data set to start from.
 
+
+-Graphical methods to visualize relationships between variables 
+With our data wrangling complete we then decided to make a few graphs using the ggplot2 package to visualise the data and try to identify relationships between the variables. We started off plotting a barchart with race along the x axis. For every race we used two different bars, one for the percentage of people in that race with income over 50k (red) and one for the percentage of people in that race earning less or equal to 50k (bleu). We used these different colours as well as percentages on the y axis to successfully visualise the ratios of people in these races earning over 50k. We also went against using the staggered function as we believed showing two bars next to each other would be a better form of visualisation for anyone viewing our work. We then repeated the same process for gender as we also wanted to have a clear idea of how gender influences the propensity for a person to have incomes over 50k.
 
 
 ## References
 
-List any references here. You should, at a minimum, list your data source.
-
+archive.ics.uci.edu/dataset/20/census+income 
+https://openintro-ims.netlify.app/model-logistic.html
 

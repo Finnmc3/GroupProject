@@ -46,7 +46,7 @@ class: center, middle
 
 ## Reasearching income inequality
 
-By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear discrepancies between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
+By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear discrepancies between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity. Keep in mind that our research is not large enough scale to consider more than two sex's h
 
 ---
 
@@ -88,6 +88,39 @@ After careful consideration we came to conclusion that sex, race and university 
 ## 4 has_degree     1.45     0.0297      48.9 0
 ```
 note that we transformed the data in such a way that race takes on the value 1 if the person is white and 0 otherwise. This is because we wanted to see specifically how being in a minority may affect people and it also allows the data to be further simplified leading to better predictions.
+
+
+---
+#Creating our prediction model
+
+By using the data from the previous slide we arrive at the following model:
+
+ `\(\log\left(\frac{p}{1 - p}\right) = -2.96 + 0.494 \times \text{race} + 1.3 \times \text{sex} + 1.45 \times \text{degree}\)`
+
+&lt;br&gt;
+
+--
+Which means that:
+
+`\(p = \frac{1}{1 + e^{2.96 - 0.494 \times \text{race} - 1.3 \times \text{sex} - 1.45 \times \text{degree}}}\)`
+
+--
+
+We then turned this data into a table to look at the results. Notice that a white male with a degree is over 11 times more likely to be of an upper class income status than that of a non-white female with no degree:
+&lt;br&gt;
+
+```
+##   race sex degree   p
+## 1    1   1      1 57%
+## 2    0   1      1 48%
+## 3    1   0      1 27%
+## 4    1   1      0 24%
+## 5    0   0      1 18%
+## 6    0   1      0 16%
+## 7    1   0      0  8%
+## 8    0   0      0  5%
+```
+
 
 
 ---
