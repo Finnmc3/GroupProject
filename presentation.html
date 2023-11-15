@@ -4,7 +4,7 @@
     <title>Income Inequality</title>
     <meta charset="utf-8" />
     <meta name="author" content="The Best Team   Finn, Tom, Jon, Scott, Roman" />
-    <meta name="date" content="2023-11-14" />
+    <meta name="date" content="2023-11-15" />
     <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2023-11-14
+### 2023-11-15
 ]
 
 ---
@@ -57,7 +57,7 @@ class: inverse, center, middle
 ---
 
 # Gender vs class
-.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of females. ]
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of ]
 .pull-right[]
 
 ```
@@ -66,6 +66,30 @@ class: inverse, center, middle
 ```
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="50%" /&gt;
+---
+
+class: inverse, center, middle
+
+#Logistic regression
+
+---
+#Logistic regression results
+
+After careful consideration we came to conclusion that sex, race and university degrees were the most interesting predictors of a persons income and also from the plots above there seems to be a clear disparity within them. Therefore, in an attempt to keep our model as simple as possible, our logistic regression uses only sex, race and degree as predictors. This resulted in the following table:
+
+
+```
+## # A tibble: 4 × 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   -2.96     0.0520     -57.0 0        
+## 2 race           0.494    0.0453      10.9 1.09e- 27
+## 3 sex Male       1.30     0.0356      36.4 3.37e-290
+## 4 has_degree     1.45     0.0297      48.9 0
+```
+note that we transformed the data in such a way that race takes on the value 1 if the person is white and 0 otherwise. This is because we wanted to see specifically how being in a minority may affect people and it also allows the data to be further simplified leading to better predictions.
+
+
 ---
 
 class: inverse, middle, center

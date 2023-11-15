@@ -45,8 +45,19 @@ adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
 
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white <- function(x){ifelse(x == " White", 1, 0)}
+
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+adult_data <- adult_data %>% select(-race_old)
+
+
+#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
 adult_data <- adult_data %>% 
   select(-capital_gain, -capital_loss)
 
@@ -75,7 +86,7 @@ class: inverse, center, middle
 ---
 
 # Gender vs class
-.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of females. ]
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of ]
 .pull-right[]
 ```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 # see how I changed out.width and fig.width from defaults
@@ -91,8 +102,31 @@ percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill 
   geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-percentage_sex
+percentage_sex ##create some more pages with graphs and explaning them
 ```
+---
+
+class: inverse, center, middle
+
+#Logistic regression
+
+---
+#Logistic regression results
+
+After careful consideration we came to conclusion that sex, race and university degrees were the most interesting predictors of a persons income and also from the plots above there seems to be a clear disparity within them. Therefore, in an attempt to keep our model as simple as possible, our logistic regression uses only sex, race and degree as predictors. This resulted in the following table:
+
+```{r logistics-table, echo = FALSE}
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ race + sex + has_degree, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
+note that we transformed the data in such a way that race takes on the value 1 if the person is white and 0 otherwise. This is because we wanted to see specifically how being in a minority may affect people and it also allows the data to be further simplified leading to better predictions.
+
+
 ---
 
 class: inverse, middle, center
