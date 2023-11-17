@@ -137,4 +137,17 @@ class_fit <- logistic_reg() %>%
 
 tidy(class_fit)
 ```
-create small table comparing each possibility whith the proable class
+``` {r age plot }
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = age, colour = class))
+
+mean_age <- adult_data %>% group_by(class) %>% summarize(mean_age = mean(age))
+mean_age
+
+```
+it may not come as a suprise that more people are rich etc... and older people are rich...
+
+list of things to do for presentation:
+fix current slide of gender vs class
+make a slide for each of the graphs and add some text explaining it
+
+

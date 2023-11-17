@@ -79,6 +79,7 @@ By extracting data on over 32000 people from a census taken in 1994 by UCLA we a
 
 Keep in mind that our research is not large enough scale to consider more than two gender's - however if we were to continue to research deeply into the topic then other sex's would most certainly be of utmost consideration.
 
+
 ---
 
 class: inverse, center, middle
