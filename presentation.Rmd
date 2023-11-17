@@ -81,11 +81,16 @@ Keep in mind that our research is not large enough scale to consider more than t
 
 
 ---
+class: center, middle
 
+## The Adult dataset
+
+In order to simplify our predictions we have turned many of the variable into binary. Although we lose some information, this approach is far more effective for our predictions and helps to simplify our data greatly. We have transformed our data set in such a way that male and female are ...
+
+---
 class: inverse, center, middle
 
 #Visualization of our key data points
-
 ---
 
 # Gender vs class

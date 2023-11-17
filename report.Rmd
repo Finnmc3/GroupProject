@@ -66,7 +66,7 @@ archive.ics.uci.edu/dataset/20/census+income a
 
 -Introduction:
 
-The primary objective of our data science project is to develop a robust predictive model capable of estimating an individual's income based on several key parameters: race, having a degree, gender, workclass, age, marital status, occupation, relationship status, capital gain, capital loss, hours per week, native country, and income (categorized as above or below 50k annually). This predictive model aims to provide an accurate estimation of income levels by leveraging these key factors.
+Any form of discrimination is concerning, and this is why we decided it was so important to discuss this topic using data.The primary objective of our data science project is to develop a robust predictive logistic model capable of estimating an individual's income based on several key parameters: race, having a degree, gender, workclass, age, marital status, occupation, relationship status, capital gain, capital loss, hours per week, native country, and income (categorized as above or below 50k annually). This predictive model aims to provide an accurate estimation of income level by leveraging these key factors. In creating this model we hope to reveal which variables are the most detrimental to a persons income class hence we hope to make clear any discrimination.
 
 For our investigation, we have selected the "adult" dataset from the UC Irvine Machine Learning Repository. This dataset comprises over 33 thousand entries and includes 13 distinct variables. We have chosen this dataset due to its credibility and richness in variables, expecting it to serve as a reliable foundation for our analysis and model development.
 
@@ -82,6 +82,13 @@ Our first steps of the project were mainly looking at the data and getting a fee
 -Graphical methods to visualize relationships between variables 
 With our data wrangling complete we then decided to make a few graphs using the ggplot2 package to visualise the data and try to identify relationships between the variables. We started off plotting a barchart with race along the x axis. For every race we used two different bars, one for the percentage of people in that race with income over 50k (red) and one for the percentage of people in that race earning less or equal to 50k (bleu). We used these different colours as well as percentages on the y axis to successfully visualise the ratios of people in these races earning over 50k. We also went against using the staggered function as we believed showing two bars next to each other would be a better form of visualisation for anyone viewing our work. We then repeated the same process for gender as we also wanted to have a clear idea of how gender influences the propensity for a person to have incomes over 50k.
 
+-conclusion
+
+Our results very clearly point towards the idea that people who are white, male or have a university degree are far more likely to be in a higher income category. However the data analysis is limited to merely that. Yes, our data points towards this despicable prejudice however it cannot explain why this discrimination is happening. However we must also take into account the fact that this census was taken in 1994 hence advances in society may mean that the data may, hopefully, differ in the our current civilization 
+
+Our data analysis makes clear that there is infact a clear discrimination however it does not explain wh, it merely proved its existance
+
+we must laso take into account that the census was in 1994 fro which scoiety has oved fowar much better since then so the numbers may look different if the data was from a more recent census.
 
 ## References
 
