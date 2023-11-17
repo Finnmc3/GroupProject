@@ -24,7 +24,7 @@ library(tidyverse)
 
 
 ```{r load-data}
-setwd("~/IDS/GroupProject/data/census+income")
+# setwd("~/IDS/GroupProject/data/census+income")
 adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
