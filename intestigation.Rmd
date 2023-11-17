@@ -49,6 +49,36 @@ adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), p
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
 
 
+# Assuming you have a dataset with columns 'education' and 'class'
+# Replace 'education' and 'class' with your actual column names
+
+
+
+
+library(ggplot2)
+
+# Calculate the total number of people for each education level
+total_counts <- aggregate(class ~ education, data = your_dataset, FUN = length)
+
+# Calculate the number of people making over 50k for each education level
+over_50k_counts <- aggregate(class ~ education, data = subset(your_dataset, class == ">50k"), FUN = length)
+
+# Merge the total and over 50k counts
+combined_data <- merge(total_counts, over_50k_counts, by = "education", suffixes = c("_total", "_over_50k"))
+
+# Calculate the proportion of people making over 50k
+combined_data$proportion_over_50k <- combined_data$class_over_50k / combined_data$class_total * 100
+
+# Create the bar plot
+ggplot(combined_data, aes(x = education, y = proportion_over_50k, fill = education)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Proportion of People Making >50k by Education Level",
+       y = "Proportion (%)",
+       x = "Education Level") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal()
+
+
 
 
 ```
