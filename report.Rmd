@@ -22,7 +22,7 @@ library(tidyverse)
 ```{r load-data, include=FALSE}
 # load your data here and any pre-processing/cleaning 
 #that you need for your report
-setwd("~/IDS/GroupProject/data/census+income")
+# setwd("~/IDS/GroupProject/data/census+income")
 adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
