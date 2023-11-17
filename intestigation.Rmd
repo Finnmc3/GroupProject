@@ -1,6 +1,6 @@
 ---
 title: "IDS investigation worksheet"
-author: "by Team31: Finn, Tom, User3, User4 & User5"
+author: "by Team31: Finn, Tom, Jon, Scott & Roman"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -29,13 +29,30 @@ adult_data <- read.csv("adult.data")
 adult_test <- read.csv("adult.csv")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-week", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
 
+adult_data <- adult_data %>% 
+  select(-capital_gain, -capital_loss)
+
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white <- function(x){ifelse(x == " White", 1, 0)}
+
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+adult_data <- adult_data %>% select(-race_old)
+
+
+#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
 
 #note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
 view(adult_data)
 
+```
+
+```{r plot degree vs class}
 #some questions about the data: income inequality between different races/genders/nationalities ; class based on type of degree ; correlation between class and age; correlation between race/gender and age E.G do certain races/genders live longer than others.
 education_counts <- adult_data %>%
   group_by(education) %>%
@@ -47,6 +64,12 @@ adult_data$education <- adult_data$education %>% factor(levels = education_count
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
+```
+
+```{r plot income vs race}
+
+#graph displaying income against race
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 # Assuming you have a dataset with columns 'education' and 'class'
@@ -80,7 +103,81 @@ ggplot(combined_data, aes(x = education, y = proportion_over_50k, fill = educati
 
 
 
+percentage_race_data <- adult_data %>%
+  group_by(race, class) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100)
+
+
+percentage_race <- ggplot(percentage_race_data, aes(x = race, y = percentage, fill = class)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(percentage_race)
+#graph showing income against sex
 
 ```
+
+```{r plot sex vs class as percentage}
+percentage_sex_data <- adult_data %>%
+  group_by(sex, class) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100)
+
+
+percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(percentage_sex)
+```
+```{r program to determine income}
+#Here we have created a program which predicts a persons class based on the other variable.
+#The program is made using conditional probabilities so we can compare this model to that of a linear regression once we make a linear regression model.
+
+conditional_probs <- with(adult_data, prop.table(table(class, race, sex, education), margin = 1))
+
+#please put a space before enetering each value and also use capitals at start
+new_individual <- data.frame(race = " White", sex = " Male", education = " Bachelors")
+
+# Calculate the conditional probabilities for both classes
+conditional_probs_above_50K <- conditional_probs[" >50K", new_individual$race, new_individual$sex, new_individual$education]
+conditional_probs_below_50K <- conditional_probs[" <=50K", new_individual$race, new_individual$sex, new_individual$education]
+
+# Compare the conditional probabilities and classify the individual
+if (conditional_probs_above_50K > conditional_probs_below_50K) {
+  result = paste("class is >50K With probability", conditional_probs_above_50K, sep = " ")
+  print(result)
+
+} else {
+  result = paste("Class is <= 50K With probability", conditional_probs_below_50K, sep = " ")
+  print(result)
+}
+```
+
+``` {r creating a logistic regression }
+
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ race + sex + has_degree, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
+``` {r age plot }
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = age, colour = class))
+
+mean_age <- adult_data %>% group_by(class) %>% summarize(mean_age = mean(age))
+mean_age
+
+```
+it may not come as a suprise that more people are rich etc... and older people are rich...
+
+list of things to do for presentation:
+fix current slide of gender vs class
+make a slide for each of the graphs and add some text explaining it
 
 

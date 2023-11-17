@@ -1,7 +1,7 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
-author: "Team name <br> Names of team members"
+title: "Income Inequality"
+subtitle: "Looking at income Inequality and determining income class based on identity variabes"
+author: "The Best Team <br> Finn, Tom, Jon, Scott, Roman"
 institute: "University of Edinburgh"
 date: "`r Sys.Date()`"
 output:
@@ -39,7 +39,27 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
-# Load your data here
+
+setwd("~/IDS/GroupProject/data/census+income")
+adult_data <- read.csv("adult.data")
+adult_test <- read.csv("adult.csv")
+
+#Changing the variable names for adult data
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white <- function(x){ifelse(x == " White", 1, 0)}
+
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+adult_data <- adult_data %>% select(-race_old)
+
+
+#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
+adult_data <- adult_data %>% 
+  select(-capital_gain, -capital_loss)
 
 ```
 
@@ -53,21 +73,91 @@ style_xaringan(
 
 class: center, middle
 
-## A statement of the overall goal / research question
+## Reasearching income inequality
+
+By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear prejudice between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
+
+Keep in mind that our research is not large enough scale to consider more than two gender's - however if we were to continue to research deeply into the topic then other sex's would most certainly be of utmost consideration.
+
 
 ---
 
 class: inverse, center, middle
 
-# Section title
+#Visualization of our key data points
 
 ---
 
-# Hello World
+# Gender vs class
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of ]
+.pull-right[]
+```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
+# see how I changed out.width and fig.width from defaults
+# to make the figure bigger
+percentage_sex_data <- adult_data %>%
+  group_by(sex, class) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100)
 
-- Click the `Knit` button to compile your presentation
 
-- Make sure to commit and push all resulting files to your GitHub repo
+percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+percentage_sex ##create some more pages with graphs and explaning them
+```
+---
+
+class: inverse, center, middle
+
+#Logistic regression
+
+---
+#Logistic regression results
+
+After careful consideration we came to conclusion that sex, race and university degrees were the most interesting predictors of a persons income and also from the plots above there seems to be a clear disparity within them. Therefore, in an attempt to keep our model as simple as possible, our logistic regression uses only sex, race and degree as predictors. This resulted in the following table:
+
+```{r logistics-table, echo = FALSE}
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ race + sex + has_degree, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
+note that we transformed the data in such a way that race takes on the value 1 if the person is white and 0 otherwise. This is because we wanted to see specifically how being in a minority may affect people and it also allows the data to be further simplified leading to better predictions.
+
+
+---
+#Creating our prediction model
+
+By using the data from the previous slide we arrive at the following model:
+
+ $\log\left(\frac{p}{1 - p}\right) = -2.96 + 0.494 \times \text{race} + 1.3 \times \text{sex} + 1.45 \times \text{degree}$
+
+<br>
+
+--
+Which means that:
+
+$p = \frac{1}{1 + e^{2.96 - 0.494 \times \text{race} - 1.3 \times \text{sex} - 1.45 \times \text{degree}}}$
+
+--
+
+We then turned this data into a table to look at the results. Notice that a white male with a degree is over 11 times more likely to be of an upper class income status than that of a non-white female with no degree:
+<br>
+```{r dataframe, echo = FALSE}
+data.frame(
+race = c( 1, 0, 1, 1, 0, 0, 1, 0),
+sex = c( 1, 1, 0, 1, 0, 1, 0, 0),
+degree = c( 1, 1, 1, 0, 1, 0, 0, 0),
+p = c("57%", "48%", "27%", "24%", "18%", "16%", "8%", "5%")
+)
+```
+
+
 
 ---
 
