@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-lib, message = FALSE}
 library(tidyverse)
+library(tidymodels)
 # Add any other libraries here
 
 
@@ -28,7 +29,7 @@ library(tidyverse)
 adult_data <- read.csv("data/adult.data")
 
 #Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours-per-week", "native-country", "class")
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours_per_week", "native-country", "class")
 
 adult_data <- adult_data %>% 
   select(-capital_gain, -capital_loss)
@@ -45,7 +46,6 @@ has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Do
 
 adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
 
-#note that adult.data is just adult.tests with a few variables removed so we only need to use the adult data
 
 view(adult_data)
 
@@ -156,7 +156,7 @@ if (conditional_probs_above_50K > conditional_probs_below_50K) {
 }
 ```
 
-``` {r creating a logistic regression }
+``` {r linear regression using sex, rae degree as predictors}
 
 adult_data$class <- factor(adult_data$class)
 
@@ -165,15 +165,85 @@ class_fit <- logistic_reg() %>%
   fit(class ~ race + sex + has_degree, data = adult_data, family = "binomial")
 
 tidy(class_fit)
+
 ```
-``` {r age plot }
+
+
+``` {r age vs class plot }
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = age, colour = class))
 
 mean_age <- adult_data %>% group_by(class) %>% summarize(mean_age = mean(age))
 mean_age
 
 ```
+
+since sex is such a good predictor of class (it has a p-value of 3.37e-290), we suspect that maybe sex is related to one of the other predictors. clearly there are no relationships between sex and race - hence we should calculate the probabiltiy of having a degree given that a person is male vs female
+``` {r creating a logistic regression }
+
+```
+hence p = 24% for males
+      p = 21% for females 
+      
+Although this is somewhat of a large discrepancy it does not fully explain the extremely low p-value for sex as a predictor of wealth 
+
+hence we then decided to predict wealth based on only sex alone
+
+``` {r creating a logistic regression }
+
+adult_data$class <- factor(adult_data$class)
+
+class_sex_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ sex, data = adult_data, family = "binomial")
+
+tidy(class_sex_fit)
+```
+
+so for this model males have a 23% chance of being upper class
+however females have a 21% chance
+being males increases your chance of being upper class by a factor of 1.189
+
+
+
+
 it may not come as a suprise that more people are rich etc... and older people are rich...
+
+```{r age vs hours per week linear regression}
+
+ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
+  geom_point() +
+  geom_smooth(method = "lm", 
+              se = FALSE) +
+  labs(
+    title = "Age vs hours worked per week",
+    x = "age (years)",
+    y = "hours-per-week"
+  )
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(hours_per_week ~ age, data = adult_data) %>%
+  tidy()
+
+```
+so hours_per_week = 38 + 0.062(age)
+
+so older people are more likely to have a greater income however they also tend to work more hours which may have some correlation. We will now take a look at this. Note that for every year older a person is the number of hour per week increases by 0.062 hours.
+
+```{r logistic regression for hours-per-week vs income class}
+
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ hours_per_week, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+
+```
+so as a persons hours worked per week increased by one hour the probability of a person being upper-class increases by a factor of 4.6%
+
+Hence we may
 
 list of things to do for presentation:
 fix current slide of gender vs class
