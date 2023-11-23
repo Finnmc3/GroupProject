@@ -44,28 +44,114 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
-## Reasearching income inequality
-
-By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear prejudice between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
-
-Keep in mind that our research is not large enough scale to consider more than two gender's - however if we were to continue to research deeply into the topic then other sex's would most certainly be of utmost consideration.
-
+## Research into the relationship between a persons identity and their income
 
 ---
 class: center, middle
 
-## The Adult dataset
-
-In order to simplify our predictions we have turned many of the variable into binary. Although we lose some information, this approach is far more effective for our predictions and helps to simplify our data greatly. We have transformed our data set in such a way that male and female are ...
+## About Our Dataset
 
 ---
-class: inverse, center, middle
+## Adult Data
 
-#Visualization of our key data points
+Our main data set is called "Adult data" and contains details of over 3300 people from a census taken in the US in 1994. Note that all of those participating in the census are over 16 years old. The key variables used in our data set are as follows:
+
+--
+
+- age
+
+--
+
+- education
+
+--
+
+- sex
+
+--
+
+- hours_per_week
+
+--
+
+- class
+
+--
+
+- race
+
 ---
+class: center, middle
 
+## Data Wrangling
+
+---
+##Wrangling our dataset
+
+Our data set did not contain any column names so our first call of action was to name the variables.
+
+add image here of code
+
+---
+##Creating binary variables
+
+Since our research invloves using binary variables to create predictive models we had to change some of our variables to make them binary - even when this meant a slight loss of information.
+
+--
+
+- We creates a new variable called "has_degree" which takes on 1 if a person has bachelors, masters or PHD and 0 otherwise
+
+
+- similarly we mutated the race variable such that it takes on 1 if a person is white and 0 otherwise. Although this means we lose some information it allows us to simplify our predictions and still lets us see discrimination towards minorities.
+
+add image here of code
+
+---
+class: center, middle
+#Analysis 1 
+##looking at how age, work-hours and sex are related to income class
+---
+##How are age and class related
+
+Observe that the overall distributions are similar however there are much more lower-class people and they generally have a younger age:
+
+- mean age for upper class is 44
+- mean age for lower-class is 37
+
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="50%" /&gt;
+---
+##So why are upper-class people older?
+One such possibility is that people generally tend to work more hours as they get older hence they may make more money for working more hours. 
+
+
+```
+## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+```
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="50%" /&gt;
+---
+##hours worked vs age
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
+
+```
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)  38.0      0.205       186.  0       
+## 2 age           0.0622   0.00500      12.4 2.02e-35
+```
+---
+class: center, middle
+##Analysis 2 - looking at how sex, race and degree relate to income class
+---
 # Gender vs class
-.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likeyl to be "upper class" than that of ]
+.pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likely to be "upper class" than that of ]
 .pull-right[]
 
 ```
@@ -73,7 +159,7 @@ class: inverse, center, middle
 ## argument.
 ```
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="50%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="50%" /&gt;
 ---
 
 class: inverse, center, middle
@@ -217,7 +303,7 @@ glance(model)
 - goes here
 ]
 .pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
 ]
 
 ---
