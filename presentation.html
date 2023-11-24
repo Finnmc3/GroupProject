@@ -4,7 +4,7 @@
     <title>Income Inequality</title>
     <meta charset="utf-8" />
     <meta name="author" content="The Best Team   Finn, Tom, Jon, Scott, Roman" />
-    <meta name="date" content="2023-11-23" />
+    <meta name="date" content="2023-11-24" />
     <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2023-11-23
+### 2023-11-24
 ]
 
 ---
@@ -130,27 +130,71 @@ One such possibility is that people generally tend to work more hours as they ge
 ```
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="50%" /&gt;
+
+
 ---
-##hours worked vs age
+##A linear regression
+
+So clearly we can see that as age increases so too does the number of hours worked
+namely, we have:
+
+`\(\text{hours_per_week} = 38 + 0.0622 \times \text{age}\)`
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
+
+```
+## $x
+## [1] "age (years)"
+## 
+## $y
+## [1] "hours-per-week"
+## 
+## $title
+## [1] "Age vs hours worked per week"
+## 
+## attr(,"class")
+## [1] "labels"
+```
+
 
 ```
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="80%" /&gt;
 
 ```
-## # A tibble: 2 × 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)  38.0      0.205       186.  0       
-## 2 age           0.0622   0.00500      12.4 2.02e-35
+## `geom_smooth()` using formula = 'y ~ x'
 ```
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-6-1.png" width="50%" /&gt;
+
+Notice that it looks like most of the blue dots (upper-class) seem to lie above the linear regression
+---
+##Looking at residuals
+
+
+```r
+hours_age_fit &lt;- linear_reg() %&gt;%
+  set_engine("lm") %&gt;%
+  fit(hours_per_week ~ age, data = adult_data)
+  
+
+hours_age_fit_aug &lt;- augment(hours_age_fit$fit)
+ggplot(hours_age_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted height", y = "Residuals")
+```
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-7-1.png" width="80%" /&gt;
+---
+to do: conclude that older people tend work more hours and people who work more hours tend to earn more which explains why older people are generally more likely to be upper class
 ---
 class: center, middle
 ##Analysis 2 - looking at how sex, race and degree relate to income class
 ---
-# Gender vs class
+#The relatioship between sex and class
 .pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likely to be "upper class" than that of ]
 .pull-right[]
 
@@ -159,7 +203,9 @@ class: center, middle
 ## argument.
 ```
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="50%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-8-1.png" width="50%" /&gt;
+---
+#lo
 ---
 
 class: inverse, center, middle
@@ -303,7 +349,7 @@ glance(model)
 - goes here
 ]
 .pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
 ]
 
 ---

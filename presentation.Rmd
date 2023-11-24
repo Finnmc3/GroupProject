@@ -158,8 +158,37 @@ One such possibility is that people generally tend to work more hours as they ge
 ```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 adult_data %>% ggplot() + geom_smooth(mapping = aes(x = age, y = hours_per_week))
 ```
+
+
 ---
-##hours worked vs age
+##A linear regression
+
+So clearly we can see that as age increases so too does the number of hours worked
+namely, we have:
+
+$\text{hours_per_week} = 38 + 0.0622 \times \text{age}$
+
+```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
+
+ggplot(data = adult_data, aes(x = age, y = hours_per_week, colour = class)) + geom_point()
+  labs(
+    title = "Age vs hours worked per week",
+    x = "age (years)",
+    y = "hours-per-week"
+  )
+```
+
+```{r, echo = FALSE}
+ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
+  geom_point() +
+  geom_smooth(method = "lm", 
+              se = FALSE) +
+  labs(
+    title = "Age vs hours worked per week",
+    x = "age (years)",
+    y = "hours-per-week"
+  )
+```
 ```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 
 ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
@@ -171,21 +200,34 @@ ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
     x = "age (years)",
     y = "hours-per-week"
   )
-
-linear_reg() %>%
-  set_engine("lm") %>%
-  fit(hours_per_week ~ age, data = adult_data) %>%
-  tidy()
-
 ```
+
+Notice that it looks like most of the blue dots (upper-class) seem to lie above the linear regression
+---
+##Looking at residuals
+
+```{r}
+hours_age_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(hours_per_week ~ age, data = adult_data)
+  
+
+hours_age_fit_aug <- augment(hours_age_fit$fit)
+ggplot(hours_age_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted height", y = "Residuals")
+```
+---
+to do: conclude that older people tend work more hours and people who work more hours tend to earn more which explains why older people are generally more likely to be upper class
 ---
 class: center, middle
 ##Analysis 2 - looking at how sex, race and degree relate to income class
 ---
-# Gender vs class
+#The relationship between sex and class
 .pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likely to be "upper class" than that of ]
 .pull-right[]
-```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
+```{r warning=FALSE, out.width="50%", fig.width=6, echo=FALSE}
 # see how I changed out.width and fig.width from defaults
 # to make the figure bigger
 percentage_sex_data <- adult_data %>%
@@ -193,7 +235,7 @@ percentage_sex_data <- adult_data %>%
   summarize(count = n()) %>%
   mutate(percentage = count / sum(count) * 100)
 
-
+s
 percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
@@ -201,6 +243,8 @@ percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill 
 
 percentage_sex ##create some more pages with graphs and explaning them
 ```
+---
+#
 ---
 
 class: inverse, center, middle

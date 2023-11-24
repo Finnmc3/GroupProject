@@ -65,58 +65,6 @@ adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), p
 #from this graph it looks as if bachelors degrees have the most people in upper class, however this does not take into account the fact that more people have bachelos in comparison to master, phd, etc..
 ```
 
-```{r plot income vs race}
-
-#graph displaying income against race
-adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-# Assuming you have a dataset with columns 'education' and 'class'
-# Replace 'education' and 'class' with your actual column names
-
-
-
-
-library(ggplot2)
-
-# Calculate the total number of people for each education level
-total_counts <- aggregate(class ~ education, data = your_dataset, FUN = length)
-
-# Calculate the number of people making over 50k for each education level
-over_50k_counts <- aggregate(class ~ education, data = subset(your_dataset, class == ">50k"), FUN = length)
-
-# Merge the total and over 50k counts
-combined_data <- merge(total_counts, over_50k_counts, by = "education", suffixes = c("_total", "_over_50k"))
-
-# Calculate the proportion of people making over 50k
-combined_data$proportion_over_50k <- combined_data$class_over_50k / combined_data$class_total * 100
-
-# Create the bar plot
-ggplot(combined_data, aes(x = education, y = proportion_over_50k, fill = education)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Proportion of People Making >50k by Education Level",
-       y = "Proportion (%)",
-       x = "Education Level") +
-  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
-  theme_minimal()
-
-
-
-percentage_race_data <- adult_data %>%
-  group_by(race, class) %>%
-  summarize(count = n()) %>%
-  mutate(percentage = count / sum(count) * 100)
-
-
-percentage_race <- ggplot(percentage_race_data, aes(x = race, y = percentage, fill = class)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-print(percentage_race)
-#graph showing income against sex
-
-```
 
 ```{r plot sex vs class as percentage}
 percentage_sex_data <- adult_data %>%
@@ -249,4 +197,8 @@ list of things to do for presentation:
 fix current slide of gender vs class
 make a slide for each of the graphs and add some text explaining it
 
+create plot of number of hours worked vs gender
 
+```{r}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = class), position = "dodge")
+```
