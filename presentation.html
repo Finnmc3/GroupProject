@@ -4,7 +4,7 @@
     <title>Income Inequality</title>
     <meta charset="utf-8" />
     <meta name="author" content="The Best Team   Finn, Tom, Jon, Scott, Roman" />
-    <meta name="date" content="2023-11-24" />
+    <meta name="date" content="2023-11-26" />
     <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2023-11-24
+### 2023-11-26
 ]
 
 ---
@@ -90,21 +90,39 @@ class: center, middle
 
 Our data set did not contain any column names so our first call of action was to name the variables.
 
-add image here of code
+
+```r
+#Changing the variable names for adult data
+colnames(adult_data) &lt;- c("age", "workclass", "id", "education", "education-num", "marital-status",
+                          "occupation", "relationship", "race_old", "sex", "capital_gain",
+                          "capital_loss", "hours_per_week", "native-country", "class")
+```
 
 ---
 ##Creating binary variables
 
-Since our research invloves using binary variables to create predictive models we had to change some of our variables to make them binary - even when this meant a slight loss of information.
-
---
-
 - We creates a new variable called "has_degree" which takes on 1 if a person has bachelors, masters or PHD and 0 otherwise
-
 
 - similarly we mutated the race variable such that it takes on 1 if a person is white and 0 otherwise. Although this means we lose some information it allows us to simplify our predictions and still lets us see discrimination towards minorities.
 
-add image here of code
+
+```r
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white &lt;- function(x){ifelse(x == " White", 1, 0)}
+
+has_degree &lt;- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data &lt;- adult_data %&gt;% mutate(race = is_white(race_old))
+adult_data &lt;- adult_data %&gt;% select(-race_old)
+
+
+#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
+has_degree &lt;- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data &lt;- adult_data %&gt;% mutate(has_degree = has_degree(education))
+adult_data &lt;- adult_data %&gt;% 
+  select(-capital_gain, -capital_loss)
+```
 
 ---
 class: center, middle
@@ -119,7 +137,7 @@ Observe that the overall distributions are similar however there are much more l
 - mean age for lower-class is 37
 
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="50%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
 ---
 ##So why are upper-class people older?
 One such possibility is that people generally tend to work more hours as they get older hence they may make more money for working more hours. 
@@ -129,39 +147,19 @@ One such possibility is that people generally tend to work more hours as they ge
 ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
 ```
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="50%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="50%" /&gt;
 
 
 ---
-##A linear regression
+##Additional evidence
 
 So clearly we can see that as age increases so too does the number of hours worked
 namely, we have:
 
 `\(\text{hours_per_week} = 38 + 0.0622 \times \text{age}\)`
 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
-
-```
-## $x
-## [1] "age (years)"
-## 
-## $y
-## [1] "hours-per-week"
-## 
-## $title
-## [1] "Age vs hours worked per week"
-## 
-## attr(,"class")
-## [1] "labels"
-```
 
 
-```
-## `geom_smooth()` using formula = 'y ~ x'
-```
-
-&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="80%" /&gt;
 
 ```
 ## `geom_smooth()` using formula = 'y ~ x'
@@ -169,32 +167,54 @@ namely, we have:
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-6-1.png" width="50%" /&gt;
 
-Notice that it looks like most of the blue dots (upper-class) seem to lie above the linear regression
+```
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)  38.0      0.205       186.  0       
+## 2 age           0.0622   0.00500      12.4 2.02e-35
+```
+
 ---
 ##Looking at residuals
 
-
-```r
-hours_age_fit &lt;- linear_reg() %&gt;%
-  set_engine("lm") %&gt;%
-  fit(hours_per_week ~ age, data = adult_data)
-  
-
-hours_age_fit_aug &lt;- augment(hours_age_fit$fit)
-ggplot(hours_age_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
-  geom_point(alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted height", y = "Residuals")
-```
-
 &lt;img src="presentation_files/figure-html/unnamed-chunk-7-1.png" width="80%" /&gt;
 ---
-to do: conclude that older people tend work more hours and people who work more hours tend to earn more which explains why older people are generally more likely to be upper class
+##But does working more relate to earning more?
+A logistic regression was made for the class variable using hours_per_week as the predictor:
+
+```
+## # A tibble: 2 × 5
+##   term           estimate std.error statistic p.value
+##   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)     -3.10     0.0529      -58.6       0
+## 2 hours_per_week   0.0464   0.00118      39.2       0
+```
+-  Hence some basic calculations show that for every year older a person is their probability of being predicted as upper class increases by roughly 0.2%
+---
+##Conclusive thoughts
+ 
+ So in this first analysis we came to the conclusion that older people tend to be financially better off. We attempt to give an explanation to this using data analysis in the following way:
+ 
+--
+ 
+ - Older people tend to work more hours
+ 
+--
+
+ - People who work more hours tend to earn more
+ 
+--
+ 
+ - Therefore older people have greater chance of earning more
+
+
 ---
 class: center, middle
-##Analysis 2 - looking at how sex, race and degree relate to income class
+##Analysis 2
+##looking at how sex, race and degree relate to income class
 ---
-#The relatioship between sex and class
+#The relationship between sex and class
 .pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likely to be "upper class" than that of ]
 .pull-right[]
 
@@ -205,7 +225,18 @@ class: center, middle
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-8-1.png" width="50%" /&gt;
 ---
-#lo
+##The relationship between education and class
+It looks as if better degrees tend to have a better blue to red ratio which implies a larger proportion of upper class 
+&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="40" /&gt;
+---
+## A closer look into those with and without a degree
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-10-1.png" width="80%" /&gt;
+---
+##Our final vizualsation is the relationship between race and class
+- 34% of white people are upper class
+- 18% of not white people are upper class.
+&lt;img src="presentation_files/figure-html/unnamed-chunk-11-1.png" width="80%" /&gt;
 ---
 
 class: inverse, center, middle
@@ -247,7 +278,6 @@ Which means that:
 --
 
 We then turned this data into a table to look at the results. Notice that a white male with a degree is over 11 times more likely to be of an upper class income status than that of a non-white female with no degree:
-&lt;br&gt;
 
 ```
 ##   race sex degree   p
@@ -349,7 +379,7 @@ glance(model)
 - goes here
 ]
 .pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+&lt;img src="presentation_files/figure-html/unnamed-chunk-12-1.png" width="100%" /&gt;
 ]
 
 ---

@@ -42,24 +42,6 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 
 adult_data <- read.csv("data/adult.data")
 
-#Changing the variable names for adult data
-colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status", "occupation", "relationship", "race_old", "sex", "capital_gain", "capital_loss", "hours_per_week", "native-country", "class")
-
-#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
-is_white <- function(x){ifelse(x == " White", 1, 0)}
-
-has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
-
-adult_data <- adult_data %>% mutate(race = is_white(race_old))
-adult_data <- adult_data %>% select(-race_old)
-
-
-#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
-has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
-
-adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
-adult_data <- adult_data %>% 
-  select(-capital_gain, -capital_loss)
 
 ```
 
@@ -119,21 +101,37 @@ class: center, middle
 
 Our data set did not contain any column names so our first call of action was to name the variables.
 
-add image here of code
+```{r}
+#Changing the variable names for adult data
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status",
+                          "occupation", "relationship", "race_old", "sex", "capital_gain",
+                          "capital_loss", "hours_per_week", "native-country", "class")
+```
 
 ---
 ##Creating binary variables
 
-Since our research invloves using binary variables to create predictive models we had to change some of our variables to make them binary - even when this meant a slight loss of information.
-
---
-
 - We creates a new variable called "has_degree" which takes on 1 if a person has bachelors, masters or PHD and 0 otherwise
-
 
 - similarly we mutated the race variable such that it takes on 1 if a person is white and 0 otherwise. Although this means we lose some information it allows us to simplify our predictions and still lets us see discrimination towards minorities.
 
-add image here of code
+```{r}
+#Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
+is_white <- function(x){ifelse(x == " White", 1, 0)}
+
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+adult_data <- adult_data %>% select(-race_old)
+
+
+#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
+adult_data <- adult_data %>% 
+  select(-capital_gain, -capital_loss)
+```
 
 ---
 class: center, middle
@@ -161,34 +159,15 @@ adult_data %>% ggplot() + geom_smooth(mapping = aes(x = age, y = hours_per_week)
 
 
 ---
-##A linear regression
+##Additional evidence
 
 So clearly we can see that as age increases so too does the number of hours worked
 namely, we have:
 
 $\text{hours_per_week} = 38 + 0.0622 \times \text{age}$
 
-```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 
-ggplot(data = adult_data, aes(x = age, y = hours_per_week, colour = class)) + geom_point()
-  labs(
-    title = "Age vs hours worked per week",
-    x = "age (years)",
-    y = "hours-per-week"
-  )
-```
 
-```{r, echo = FALSE}
-ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
-  geom_point() +
-  geom_smooth(method = "lm", 
-              se = FALSE) +
-  labs(
-    title = "Age vs hours worked per week",
-    x = "age (years)",
-    y = "hours-per-week"
-  )
-```
 ```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 
 ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
@@ -200,13 +179,18 @@ ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
     x = "age (years)",
     y = "hours-per-week"
   )
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(hours_per_week ~ age, data = adult_data) %>%
+  tidy()
+
 ```
 
-Notice that it looks like most of the blue dots (upper-class) seem to lie above the linear regression
 ---
 ##Looking at residuals
 
-```{r}
+```{r, echo = FALSE}
 hours_age_fit <- linear_reg() %>%
   set_engine("lm") %>%
   fit(hours_per_week ~ age, data = adult_data)
@@ -216,13 +200,43 @@ hours_age_fit_aug <- augment(hours_age_fit$fit)
 ggplot(hours_age_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted height", y = "Residuals")
+  labs(x = "Predicted hours worked", y = "Residuals")
 ```
 ---
-to do: conclude that older people tend work more hours and people who work more hours tend to earn more which explains why older people are generally more likely to be upper class
+##But does working more relate to earning more?
+A logistic regression was made for the class variable using hours_per_week as the predictor:
+```{r class vs hour-per-week, echo = FALSE}
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ hours_per_week, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
+-  Hence some basic calculations show that for every year older a person is their probability of being predicted as upper class increases by roughly 0.2%
+---
+##Conclusive thoughts
+ 
+ So in this first analysis we came to the conclusion that older people tend to be financially better off. We attempt to give an explanation to this using data analysis in the following way:
+ 
+--
+ 
+ - Older people tend to work more hours
+ 
+--
+
+ - People who work more hours tend to earn more
+ 
+--
+ 
+ - Therefore older people have greater chance of earning more
+
+
 ---
 class: center, middle
-##Analysis 2 - looking at how sex, race and degree relate to income class
+##Analysis 2
+##looking at how sex, race and degree relate to income class
 ---
 #The relationship between sex and class
 .pull-left[ Here we have a plot that demonstrates a clear discrepancy between the income class of males and females. Note that our "Class" variable is binary as it takes on only the values "above 50 k" and "below 50k". With this is mind we can see that males are almost 3 times more likely to be "upper class" than that of ]
@@ -235,7 +249,6 @@ percentage_sex_data <- adult_data %>%
   summarize(count = n()) %>%
   mutate(percentage = count / sum(count) * 100)
 
-s
 percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
@@ -244,7 +257,31 @@ percentage_sex <- ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill 
 percentage_sex ##create some more pages with graphs and explaning them
 ```
 ---
-#
+##The relationship between education and class
+It looks as if better degrees tend to have a better blue to red ratio which implies a larger proportion of upper class 
+```{r warning=FALSE, out.width="40", fig.width=5, echo=FALSE}
+education_counts <- adult_data %>%
+  group_by(education) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+adult_data$education <- adult_data$education %>% factor(levels = education_counts$education)
+
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+---
+## A closer look into those with and without a degree
+
+```{r, echo = FALSE}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = has_degree, fill = class), position = "dodge")
+```
+---
+##Our final vizualsation is the relationship between race and class
+- 34% of white people are upper class
+- 18% of not white people are upper class.
+```{r warning=FALSE, echo=FALSE}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + labs( x = "Not White                                                        White")
+```
 ---
 
 class: inverse, center, middle
@@ -285,7 +322,6 @@ $p = \frac{1}{1 + e^{2.96 - 0.494 \times \text{race} - 1.3 \times \text{sex} - 1
 --
 
 We then turned this data into a table to look at the results. Notice that a white male with a degree is over 11 times more likely to be of an upper class income status than that of a non-white female with no degree:
-<br>
 ```{r dataframe, echo = FALSE}
 data.frame(
 race = c( 1, 0, 1, 1, 0, 0, 1, 0),
