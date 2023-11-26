@@ -259,7 +259,7 @@ percentage_sex ##create some more pages with graphs and explaning them
 ---
 ##The relationship between education and class
 It looks as if better degrees tend to have a better blue to red ratio which implies a larger proportion of upper class 
-```{r warning=FALSE, out.width="40", fig.width=5, echo=FALSE}
+```{r warning=FALSE, echo=FALSE}
 education_counts <- adult_data %>%
   group_by(education) %>%
   summarise(count = n()) %>%
@@ -273,20 +273,19 @@ adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), p
 ## A closer look into those with and without a degree
 
 ```{r, echo = FALSE}
-adult_data %>% ggplot() + geom_bar(mapping = aes(x = has_degree, fill = class), position = "dodge")
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = has_degree, fill = class), position = "dodge") + labs( x = "No Degree                           Degree")
+
 ```
 ---
-##Our final vizualsation is the relationship between race and class
-- 34% of white people are upper class
-- 18% of not white people are upper class.
+##The relationship between race and class
 ```{r warning=FALSE, echo=FALSE}
 adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + labs( x = "Not White                                                        White")
+
+# 34% of white people are upper class
+# 18% of not white people are upper class.
+
+
 ```
----
-
-class: inverse, center, middle
-
-#Logistic regression
 
 ---
 #Logistic regression results
@@ -332,6 +331,31 @@ p = c("57%", "48%", "27%", "24%", "18%", "16%", "8%", "5%")
 ```
 
 
+---
+#Conclusive Results
+Our findings clearly indicate that following demographic has the largest proportion of upper-class citizens:
+
+--
+
+- Older age
+
+--
+
+- Male
+
+--
+
+- White
+
+--
+
+- Having a Degree
+
+--
+
+## A Final Word
+
+What we have quantified in here is alarming and disturbing. However, one aspect that makes this discrimination so difficult to address is that the experiment, as well-designed as it is, cannot send us much signal about why this prejudice is occurring. It is only possible to say that discrimination is happening. Finding strong evidence of racism, sexism and ageism for individual cases is a persistent challenge in enforcing anti-discrimination laws.
 
 ---
 
