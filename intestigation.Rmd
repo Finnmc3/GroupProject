@@ -200,5 +200,30 @@ make a slide for each of the graphs and add some text explaining it
 create plot of number of hours worked vs gender
 
 ```{r}
-adult_data %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = class), position = "dodge")
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + labs( x = "Not White                                                        White")
+prop_white <- adult_data %>% filter(race == 1) %>% summarise(prop_white = sum(class == " >50K")/sum(class == " <=50K"))
+prop_white
+
+prop_not_white <- adult_data %>% filter(race == 0) %>% summarise(prop_not_white = sum(class == " >50K")/sum(class == " <=50K"))
+prop_not_white
+```
+
+```{r class vs hour-per-week, echo = FALSE}
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ hours_per_week, data = adult_data, family = "binomial")
+
+tidy(class_fit)
+```
+
+```{r class-vs-age, echo = FALSE}
+adult_data$class <- factor(adult_data$class)
+
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ age, data = adult_data, family = "binomial")
+
+tidy(class_fit)
 ```
