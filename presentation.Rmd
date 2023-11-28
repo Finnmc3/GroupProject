@@ -170,6 +170,10 @@ $\text{hours_per_week} = 38 + 0.0622 \times \text{age}$
 
 ```{r warning=FALSE, out.width="50%", fig.width=4, echo=FALSE}
 
+
+
+
+
 ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
   geom_point() +
   geom_smooth(method = "lm", 
