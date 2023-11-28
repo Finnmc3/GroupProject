@@ -47,10 +47,18 @@ What we have quantified in this section is alarming and disturbing. However, one
 
 ## Research Question
 
+Our aim is to look investigate the relationship between income and personal variables. This means looking at how factors such as age, race, gender, degree and looking at how their income class throughout western society. Our project hopes to make evident any clear discrepancies in income that may be as a result of person variables. We then hope to use this data to create a prediction model that will determine the likelihood of person being of upper class income, that is making over 50K a year. Furthermore we also carry out an analysis which attempts to explain the relationship between age and income. Our hypothesis was that older people tend to work higher hours and people who work higher hours generally make more money hence older people tend to make more money - that is of course up until the age of retirement.
+
 Investigating variables that affect income from a data set of 33000 individuals from a UCLA census.
 
 
 ## Data
+
+Our data set is called "Adult_data" which contains
+
+Our main dataset is called "Adult data" which contains... and is from... 
+
+we then also used a data set taken more recently in order to compare them...
 
 A Census of 3300 people taken in 1994 that includes information on adults(over 16's): age, race, sex,native-country , class, etc.
 
@@ -65,6 +73,10 @@ archive.ics.uci.edu/dataset/20/census+income a
 
 
 -Introduction:
+
+By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear prejudice between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
+
+Keep in mind that our research is not large enough scale to consider more than two gender's - however if we were to continue to research deeply into the topic then other sex's would most certainly be of utmost consideration.
 
 Any form of discrimination is concerning, and this is why we decided it was so important to discuss this topic using data.The primary objective of our data science project is to develop a robust predictive logistic model capable of estimating an individual's income based on several key parameters: race, having a degree, gender, workclass, age, marital status, occupation, relationship status, capital gain, capital loss, hours per week, native country, and income (categorized as above or below 50k annually). This predictive model aims to provide an accurate estimation of income level by leveraging these key factors. In creating this model we hope to reveal which variables are the most detrimental to a persons income class hence we hope to make clear any discrimination.
 
