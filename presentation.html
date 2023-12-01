@@ -4,7 +4,7 @@
     <title>Interpreting census data</title>
     <meta charset="utf-8" />
     <meta name="author" content="The Best Team   Finn, Tom, Jon, Scott, Roman" />
-    <meta name="date" content="2023-11-29" />
+    <meta name="date" content="2023-12-01" />
     <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2023-11-29
+### 2023-12-01
 ]
 
 ---
@@ -44,7 +44,7 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
-## Research into the relationship between a persons identity and their income
+## Research into which demographics have the highest proportion of upper-class citizens
 
 ---
 class: center, middle
@@ -54,7 +54,7 @@ class: center, middle
 ---
 ## Adult Data
 
-Our main data set is called "Adult data" and contains details of over 3300 people from a census taken in the US in 1994. Note that all of those participating in the census are over 16 years old. The key variables used in our data set are as follows:
+Our main data set is called "Adult data" and contains details of over 3300 people from a Census taken in the US in 1994. Note that all of those participating in the census are over 16 years old. The key variables used in our data set are as follows:
 
 --
 
@@ -110,31 +110,29 @@ colnames(adult_data) &lt;- c("age", "workclass", "id", "education", "education-n
 #Here we have transformed the race variable to make it binary depending on if the person is white or not (1 for white 0 for other)
 is_white &lt;- function(x){ifelse(x == " White", 1, 0)}
 
-has_degree &lt;- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+is_married &lt;- function(x){ifelse(x == " Married-civ-spouse", 1,0)}
+adult_data &lt;- adult_data %&gt;% mutate(is_married = is_married(`marital-status`) )
 
 adult_data &lt;- adult_data %&gt;% mutate(race = is_white(race_old))
-adult_data &lt;- adult_data %&gt;% select(-race_old)
 
-
-#Here we have created a new "has degree" variable which is a binary value taking on 1 if the person has a degree
 has_degree &lt;- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
-
 adult_data &lt;- adult_data %&gt;% mutate(has_degree = has_degree(education))
-adult_data &lt;- adult_data %&gt;% 
-  select(-capital_gain, -capital_loss)
+
+adult_data &lt;- adult_data %&gt;% select(-capital_gain, -capital_loss, -race_old)
 ```
 
 ---
 class: center, middle
 #Analysis 1 
-##looking at how age, work-hours and sex are related to income class
+##How age and work hours relate to income
 ---
 ##How are age and class related
 
 Observe that the overall distributions are similar however there are much more lower-class people and they generally have a younger age:
 
-- mean age for upper class is 44
-- mean age for lower-class is 37
+- We used position = "identity" to have the two plots overlap each other
+- Mean age for upper class is 44
+- Mean age for lower-class is 37
 
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="50%" /&gt;
@@ -212,10 +210,9 @@ A logistic regression was made for the class variable using hours_per_week as th
 ---
 class: center, middle
 ##Analysis 2
-##looking at how sex, race and degree relate to income class
+##Looking at how sex, race and degree relate to income class
 ---
 #The relationship between sex and class
-
 
 ```
 ## `summarise()` has grouped output by 'sex'. You can override using the `.groups`
@@ -223,17 +220,28 @@ class: center, middle
 ```
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-8-1.png" width="50%" /&gt;
+
+---
+##But what causes such a discrepency between the class of each sex?
+One possible explanation is again the possibility that one sex may have tended to work more hours than another (keep in mind that this data is from 1994 where the different attidues towards each sex were much more previlent.)
+.pull-left[- Mean hours worked per week for males in 42.4
+- Mean hours worked per week for females is 36.4
+- notice that the red line is higher on the left and the blue takes over on the right
+
+
+hence from before since people who work more tend to earn more this may be one key component of the many different contributers to this class inequity between the two sex's.]
+&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="50%" /&gt;
+
 ---
 ##The relationship between education and class
-It looks as if better degrees tend to have a better blue to red ratio which implies a larger proportion of upper class 
-&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="80%" /&gt;
----
-## A closer look into those with and without a degree
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-10-1.png" width="80%" /&gt;
 ---
-##The relationship between race and class
+## A closer look into those with and without a degree
 &lt;img src="presentation_files/figure-html/unnamed-chunk-11-1.png" width="80%" /&gt;
+---
+##The relationship between race and class
+&lt;img src="presentation_files/figure-html/unnamed-chunk-12-1.png" width="80%" /&gt;
 
 ---
 #Logistic regression results
@@ -256,7 +264,7 @@ note that we transformed the data in such a way that race takes on the value 1 i
 ---
 #Creating our prediction model
 
-By using the data from the previous slide we arrive at the following model:
+By using the data from the previous slide we arrive at the following logit function model:
 
  `\(\log\left(\frac{p}{1 - p}\right) = -2.96 + 0.494 \times \text{race} + 1.3 \times \text{sex} + 1.45 \times \text{degree}\)`
 
@@ -309,8 +317,6 @@ Our findings clearly indicate that following demographic has the largest proport
 ## A Final Word
 
 What we have quantified in here is alarming and disturbing. However, one aspect that makes this discrimination so difficult to address is that the experiment, as well-designed as it is, cannot send us much signal about why this prejudice is occurring. It is only possible to say that discrimination is happening. Finding strong evidence of racism, sexism and ageism for individual cases is a persistent challenge in enforcing anti-discrimination laws.
-
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
