@@ -1,6 +1,6 @@
 ---
-title: "Project title"
-author: "by Team-Name: User1, User2, User3, User4 & User5"
+title: "Demographic Features & Income"
+author: "by THE BEST TEAM: Tom Cummings,Jon Francis, Finn Mclachlan, Roman Davies & Scott Gowan"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-lib, include = FALSE}
 library(tidyverse)
+library(tidymodels)
 # Add any other libraries here
 
 
@@ -19,91 +20,184 @@ library(tidyverse)
 ```
 
 
-```{r load-data, include=FALSE}
-# load your data here and any pre-processing/cleaning 
-#that you need for your report
-# setwd("~/IDS/GroupProject/data/census+income")
-adult_data <- read.csv("adult.data")
-adult_test <- read.csv("adult.csv")
+```{r load-data}
 
-colnames(adult_data) <- c("age", "workclass", "fnlwgt", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-weed", "native-country", "class")
+adult_data <- read.csv("data/adult.data")
+```
 
+In excess, income inequalities perpetuate economic instabilities and slower growth rates, as well as social discontent and political polarisation. Indeed, income inequality is a well-established controversy in economics. Whilst in part, these disparities can be accredited to varying capacities of effort, talent and luck; they also pertain to underlying prejudices and differences in demographic characteristics. In this project, we aim to highlight income inequalities between different demographics in the U.S. using reliable data from the UCLA census database. The results of our data analysis, ultimately predicting income levels based on demographic features, confirm the existence of such income inequalities and provide justifications where appropriate. Importantly, this investigation has been carried out not to further confirmation biases on political doctrine, but provide impartial evidence on whether these disparities exist, and if so, whether it is fair to attribute them exclusively to discrimination. 
 
+Data:
 
+The "Census Income" or “adult.data” dataset is a collection of information related to individuals and their income from the UC Irvine Machine Learning Repository, derived from the 1994 U.S. census with over 33,000 entries. This includes age (from over 16 onwards), education, race, gender and hours worked per week as the variables that we have deemed most prominent in the discussion of income disparities and demographics; along with marital and relationship status, capital gain, capital loss, and native country, which will not feature. The dataset shows whether, based on these factors, an individual earns more than $50k annually. Granted this 1994 dataset may yield outdated results as cultural and economic factors change over time, though exaggerated in severity, these same trends of income inequality still stand today and so the data remains a feasible candidate for our exploration. 
+
+Research Question:
+
+How do various demographic factors contribute to income inequality, and can a predictive logistic model accurately identify these disparities within the 'Census Income' dataset? –
+– Here, further clarifications must be made. Income levels have been binarised as either over or under-and-equal to $50k annually; categorised as ‘upper-class’ and ‘lower-class’ respectively. This investigation discerns inequalities solely based on the division of demographics into these two groups, simplifying our predictive model and allowing for more comprehensive interpretations of visualised data later on, lest overly complex financial figures. We also recognise that adult.data cannot alone paint the full picture. Many factors influence these disparities, and a full inspection would certainly require research and data that well surpasses the scope of this short report. Chiefly as a data science project, including additional data would not further demonstrate any of the skills acquired through this course; the methods behind our findings becoming overly repetitive. 
+
+Methodology and Findings:
+
+The framework for our approach is as follows: begin with data pre-processing to make less laborious the data interpretation; create visualisations to explore income distribution (in classes) across age, gender, education levels and race; construct a logistic regression model to predict income class against race, gender and qualifications; and finally, making a predictive model of income class for any given person based on their specific demographic features. We believe this procedure gives insight into the relationship between demographics and their income, as well as providing basic justifications for evident discrepancies.
+
+Data Wrangling:
+
+```{r}
+#Changing the variable names for adult data
+colnames(adult_data) <- c("age", "workclass", "id", "education", "education-num", "marital-status",
+                          "occupation", "relationship", "race_old", "sex", "capital_gain",
+                          "capital_loss", "hours_per_week", "native-country", "class")
+
+```
+
+First, after reading the two datasets above (adult.test including very similar statistics to adult.data), wrangling is required to prepare them for analysis. Initially our data did not contain column names, and so variable names were assigned. The aforementioned lesser important variables such as capital gain and loss were removed using the select() function from the ‘dplyr’ package. Next, new binary variables 'race' and 'has_degree' were created. 'Race' indicates whether a person is white or not; the 'is_white' function returns 1 if the original 'race_old' variable is "White", and 0 is returned otherwise. Mutating adds the new 'race' variable, and 'race_old' is removed in a similar fashion to capital gain and loss. Likewise, the 'has_degree' function will return 1 if the 'education' variable reads "Bachelors", "Masters" or "Doctorate", and 0 otherwise. The mutate() function adds the new 'has_degree' variable: (664)
+
+```{r}
+is_white <- function(x){ifelse(x == " White", 1, 0)}
+
+adult_data <- adult_data %>% mutate(race = is_white(race_old))
+
+has_degree <- function(x){ifelse(x == " Bachelors" | x == " Masters" | x == " Doctorate", 1, 0)}
+
+adult_data <- adult_data %>% mutate(has_degree = has_degree(education))
+
+adult_data <- adult_data %>% select(-capital_gain, -capital_loss, -race_old)
+
+```
+
+Age and Income Class:
+
+```{r}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = age, colour = class), position = "identity")
+
+mean_age <- adult_data %>% group_by(class) %>% summarize(mean_age = mean(age))
+mean_age
+```
+Age, though not through a prejudicial lens, is still an important determinant of income. We’ve created a bar plot using geom_bar() in ggplot2 to visualise the distribution of ages for the two income classes expressed in red and blue on the graph; the ‘Position = “identity”’ function allows the two curves to overlay. Additionally, we have calculated the mean age for each income class using the group_by and summarise functions, giving us a mean age for the upper-class as 44, and for the lower-class 37. This notable difference suggests that on average individuals in the upper-class are older than those in the lower-class. A potential contributing factor, captured by adult.data and scrutinised below, is the number of ‘hours-per-week’ worked:
+
+```{r,echo=FALSE}
+adult_data %>% ggplot() + geom_smooth(mapping = aes(x = age, y = hours_per_week))
+```
+
+```{r, echo=FALSE}
+
+ggplot(data = adult_data, aes(x = age, y = hours_per_week)) +
+  geom_point() +
+  geom_smooth(method = "lm", 
+              se = FALSE) +
+  labs(
+    title = "Age vs hours worked per week",
+    x = "age (years)",
+    y = "hours-per-week"
+  )
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(hours_per_week ~ age, data = adult_data) %>%
+  tidy()
+
+```
+
+```{r, echo = FALSE}
+hours_age_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(hours_per_week ~ age, data = adult_data)
+  
+
+hours_age_fit_aug <- augment(hours_age_fit$fit)
+ggplot(hours_age_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted hours worked", y = "Residuals")
+```
+
+Older people tend to work more hours and hence earn higher incomes. This is evidenced by the graphs above of ‘age’ versus ‘hours_per_week’, forming the linear regression equation of ‘hours__per_week = 38+0.0622 x age’. The coefficient for the age variable is 0.0622, indicating that as age increases by one year, the model predicts an additional 0.0622 hours worked per week. Upon evaluating a plot of residuals for the linear regression a subtle downwards trend emerges, albeit on a minute scale within the broader context of the plot. This observation suggests that the linear model may not be the optimal fit, with residuals exhibiting a slight deviation from the expected pattern. Further, our logistic regression model with ‘hours_per_week’ as the predictor shows that for every year a person ages, their probability of being predicted upper-class increases by 0.2%. Nevertheless, this relatively small positive association suggests that other factors are at play. upper-class individuals may have had more time to advance in their careers, pursue advanced education, accumulate wealth and specialise in their industry for higher earning potentials for example. Obviously, age alone may not be a direct cause of income disparities.
+
+Gender and Income Class:
+
+```{r, echo=FALSE}
+percentage_sex_data <- adult_data %>%
+  group_by(sex, class) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100)
+
+ggplot(percentage_sex_data, aes(x = sex, y = percentage, fill = class)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, position = position_dodge(width = 0.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+The curious relationship between gender and income have led to heated debate over probable inherent workplace biases (i.e. the gender-pay-gap). Our graphed interpretation of the dataset confirms this discrepancy in male-female income. Within our code, ‘geom_bar(stat = "identity", position = "dodge")’ creates a grouped bar plot where each gender has adjacent bars, and the height of each bar represents the percentage of a specific income class within that gender. With 30.6%, males have around three times the quantity of women with 10.9% as their respective proportions in the upper-class.
+
+``` {r,echo=FALSE}
+adult_data %>% ggplot() + geom_density(mapping = aes(x = hours_per_week, colour = sex))
+
+```
+
+Again, one possible explanation for such a difference could be in contrasting hours worked. A new graph, overlaying the sexes and their ‘hours_per_week’ worked shows a discrepancy in mean weekly working hours, with men averaging 42.4 and women 36.4. The higher average for men may indicate a societal or occupational trend where men, on average, engage in professions requiring longer hours (some occupations also yield higher pay regardless of hours). Various factors, including societal expectations and caregiving responsibilities, especially in the 90s, may contribute to this difference. These mean values however, do not provide a nuanced understanding of individual circumstances, and it is likely that female income was, on average, subject to some discrimination. (1191)
+
+Education and Income Class:
+
+```{r,echo=FALSE}
+education_counts <- adult_data %>%
+  group_by(education) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+adult_data$education <- adult_data$education %>% factor(levels = education_counts$education)
+
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = education, fill = class), position = "dodge") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+In a similar fashion to the gender-income bar plot, a graph of education level versus income class has been established. Certainly, significant impacts of qualifications on income are expected. Our code first calculates and arranges the count of observations for each education level, creating a data frame named ‘education_counts.’ Subsequently, it reorders the levels of  'education' based on these counts. Each bar in the plot represents observational counts for different income classes within each education level. While it may appear that 'HS-Grad' has the highest population in the lower-class and 'Bachelors' dominates the upper-class, it's important to note that these observations are influenced by the larger overall populations of these educational groups rather than indicating the inherent impact of education on income levels. A more meaningful analysis involves considering the percentage representation of each education level within their respective income classes (i.e. 'Doctorates' may proportionally lead to the highest representation in the upper-class, offering a more insightful perspective). Consequently, a new plot will be generated to illustrate these percentage-based results, correcting for the misrepresentation that raw counts may introduce and providing a clearer understanding of the predictive power of education levels in determining income levels.
+
+```{r, echo = FALSE}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = has_degree, fill = class), position = "dodge") + labs( x = "No Degree                           Degree")
+
+#Note that 47% of people with degrees are upper-class whereas only 17% of people without degrees are upper-class
+```
+
+Utilising the 'has_degree' binary variable, we discern a notable concentration of upper-class individuals within the 'Degree' group, contrasting with a smaller portion in the 'No Degree' category. Yet, due to the dataset's predominant focus on individuals without degrees, a modest percentage still yields a higher count of upper-class individuals without degrees. This can be explained positively, levelling imbalanced educational opportunities.
+
+Race and Income Class:
+
+```{r, echo=FALSE}
+adult_data %>% ggplot() + geom_bar(mapping = aes(x = race, fill = class), position = "dodge") + labs( x = "Not White                                                        White")
+
+# 34% of white people are upper-class
+# 18% of not white people are upper-class.
 
 
 ```
-##notes
-all ages are above 16
 
-remember to make diagnostics plots for any linear models
+Exploring another demographic aspect, our code visually represents the distribution of income classes across diverse racial categories in the 'race' variable. The plot employs the dodge position to arrange bars side-by-side for different racial categories. Subsequently, a bar plot depicting the percentage of individuals by race and income class is created. Notably, when it comes to attaining upper-class status, minorities face less favourable odds in comparison to their counterparts. Specifically, the figures reveal that 34% of white individuals are eligible for considerations as upper-class, contrasting with 18% for all minorities. Justifications for this disparity were not convincingly conveyed through the dataset. Racist dogma continually influences employment and incomes, and hence it is plausible to suggest that more nuanced factors that affect income from race, such as occupational choices and education levels, may still stem from inherent prejudice. (1588)
 
-take into account the type of people who will have taken part in the census
-The data was taken in 1994 
- 
-we can make a prediction algorith to determines someones class based on all of the other data 
+Predictive model:
 
-What we have quantified in this section is alarming and disturbing. However, one aspect that makes this racism so difficult to address is that the experiment, as well-designed as it is, cannot send us much signal about which employers are discriminating. It is only possible to say that discrimination is happening, even if we cannot say which particular callbacks — or non-callbacks — represent discrimination. Finding strong evidence of racism for individual cases is a persistent challenge in enforcing anti-discrimination laws.
+```{r}
+adult_data$class <- factor(adult_data$class)
 
-## Research Question
+class_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(class ~ race + sex + has_degree, data = adult_data, family = "binomial")
 
-Our aim is to look investigate the relationship between income and personal variables. This means looking at how factors such as age, race, gender, degree and looking at how their income class throughout western society. Our project hopes to make evident any clear discrepancies in income that may be as a result of person variables. We then hope to use this data to create a prediction model that will determine the likelihood of person being of upper class income, that is making over 50K a year. Furthermore we also carry out an analysis which attempts to explain the relationship between age and income. Our hypothesis was that older people tend to work higher hours and people who work higher hours generally make more money hence older people tend to make more money - that is of course up until the age of retirement.
+tidy(class_fit)
+```
 
-Investigating variables that affect income from a data set of 33000 individuals from a UCLA census.
+Finally, we formed a predictive model built upon 'race,' 'sex,' and 'has_degree' as fundamental income differentiators. First calculating conditional probabilities for a new individual's income class based on specified demographic features, we provide a direct prediction. Then transforming the 'class' variable into a factor, fitting a logistic regression model using 'race,' 'sex,' and 'has_degree' as predictors, and displaying coefficients, elucidates how these features collectively influence income class likelihood. Moreover, using binarised variables simplifies and makes more accurate predictions. 
 
+The logit function ‘log(1/(1-p))=-2.96 + (0.494*race) + (1.3*sex) + (1.45*degree)’ derived from the logistic regression model then expresses the log-odds of belonging to the upper-class. The intercept (-2.96) signifies the baseline log-odds, while positive coefficients for 'race' (0.494), 'sex' (1.3), and 'degree' (1.45) indicate increases in the likelihood of being in the upper-class. Exponentiating these coefficients yields odds ratios, conveying the multiplicative change in odds for a one-unit change in each predictor variable. 
 
-## Data
+```{r dataframe, echo = FALSE}
+data.frame(
+race = c( 1, 0, 1, 1, 0, 0, 1, 0),
+sex = c( 1, 1, 0, 1, 0, 1, 0, 0),
+degree = c( 1, 1, 1, 0, 1, 0, 0, 0),
+p = c("57%", "48%", "27%", "24%", "18%", "16%", "8%", "5%")
+)
+```
+Disconcertingly, our findings are indicative of large disparities of income in certain demographic groups. A white male with a degree is over 11x more likely to be upper-class than a non-white female without one. To re-emphasise, our results cannot fully quantify the reasons behind disparities, but only provide evidence for and speculate over their existence. Further, anti-discrimination laws are hard to implement with deep complexity around contributing factors. If any consolation, the socio-political landscape has greatly shifted since 1994, and at present, the progressive nature of income inequality is clear. 
 
-Our data set is called "Adult_data" which contains
+##References:
 
-Our main dataset is called "Adult data" which contains... and is from... 
-
-we then also used a data set taken more recently in order to compare them...
-
-A Census of 3300 people taken in 1994 that includes information on adults(over 16's): age, race, sex,native-country , class, etc.
-
-archive.ics.uci.edu/dataset/20/census+income a 
-
-
-
-
-
-
-## Findings
-
-
--Introduction:
-
-By extracting data on over 32000 people from a census taken in 1994 by UCLA we aim to find out which variables, such as gender, race and age, have the largest affect on a persons income. Hence our research into the income inequality between identities should make clear whether or not their is any clear prejudice between certain types of people and if so which types of people are discriminated against the most. Furthermore we will then extrapolate this data using modeling methods in order to predict a persons class based on their identity.
-
-Keep in mind that our research is not large enough scale to consider more than two gender's - however if we were to continue to research deeply into the topic then other sex's would most certainly be of utmost consideration.
-
-Any form of discrimination is concerning, and this is why we decided it was so important to discuss this topic using data.The primary objective of our data science project is to develop a robust predictive logistic model capable of estimating an individual's income based on several key parameters: race, having a degree, gender, workclass, age, marital status, occupation, relationship status, capital gain, capital loss, hours per week, native country, and income (categorized as above or below 50k annually). This predictive model aims to provide an accurate estimation of income level by leveraging these key factors. In creating this model we hope to reveal which variables are the most detrimental to a persons income class hence we hope to make clear any discrimination.
-
-For our investigation, we have selected the "adult" dataset from the UC Irvine Machine Learning Repository. This dataset comprises over 33 thousand entries and includes 13 distinct variables. We have chosen this dataset due to its credibility and richness in variables, expecting it to serve as a reliable foundation for our analysis and model development.
-
-It's crucial to note that the data we're working with originates from a census conducted in 1994 and only considers adults over the age of 16. While this dataset offers substantial insights, the temporal and age gap might introduce challenges due to potential changes in societal, economic, and cultural factors over time. We will address and mitigate these potential limitations as part of our analysis process.
-
-Through this report, we aim to explore, analyze, and build predictive models that effectively estimate an individual's income based on the provided variables. Our ultimate goal is to develop an accurate predictor while acknowledging and accounting for any potential biases or limitations introduced by the dataset's age.
-
-
--First steps:
-Our first steps of the project were mainly looking at the data and getting a feel for how we would go about elaborating the predictor. We started off by doing some simple wrangling where we eliminated some NA values from the the dataset as well as eliminating some variables like capital gain and capital loss as it represents the amount of money won or lost in assets (mainly stocks and shares by each member , something we thought would not be important as the majority of people have a very small pool of assets. Also after looking at the data both of these columns had virtually all values of zero so we decided to be selective of unnecessary data such as this. Furthermore, we also changed the name of the column previously called fnlwgt to ID where we reached a point where we were happy with our data and had a clear and organised data set to start from.
-
-
--Graphical methods to visualize relationships between variables 
-With our data wrangling complete we then decided to make a few graphs using the ggplot2 package to visualise the data and try to identify relationships between the variables. We started off plotting a barchart with race along the x axis. For every race we used two different bars, one for the percentage of people in that race with income over 50k (red) and one for the percentage of people in that race earning less or equal to 50k (bleu). We used these different colours as well as percentages on the y axis to successfully visualise the ratios of people in these races earning over 50k. We also went against using the staggered function as we believed showing two bars next to each other would be a better form of visualisation for anyone viewing our work. We then repeated the same process for gender as we also wanted to have a clear idea of how gender influences the propensity for a person to have incomes over 50k.
-
--conclusion
-
-Our results very clearly point towards the idea that people who are white, male or have a university degree are far more likely to be in a higher income category. However the data analysis is limited to merely that. Yes, our data points towards this despicable prejudice however it cannot explain why this discrimination is happening. However we must also take into account the fact that this census was taken in 1994 hence advances in society may mean that the data may, hopefully, differ in the our current civilization 
-
-Our data analysis makes clear that there is infact a clear discrimination however it does not explain wh, it merely proved its existance
-
-we must laso take into account that the census was in 1994 fro which scoiety has oved fowar much better since then so the numbers may look different if the data was from a more recent census.
-
-## References
-
-archive.ics.uci.edu/dataset/20/census+income 
-https://openintro-ims.netlify.app/model-logistic.html
-
+Horesh, Yair, Noa Haas, Yehezkel Resheff, and Ron Kohavi. 1996. “Census Income.” UCI Machine Learning Repository. https://archive.ics.uci.edu/dataset/20/census+income.

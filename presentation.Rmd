@@ -255,13 +255,13 @@ percentage_sex ##create some more pages with graphs and explaning them
 
 ---
 ##But what causes such a discrepency between the class of each sex?
-One possible explanation is again the possibility that one sex may have tended to work more hours than another (keep in mind that this data is from 1994 where the different attidues towards each sex were much more previlent.)
+
 .pull-left[- Mean hours worked per week for males in 42.4
 - Mean hours worked per week for females is 36.4
 - notice that the red line is higher on the left and the blue takes over on the right
 
 
-hence from before since people who work more tend to earn more this may be one key component of the many different contributers to this class inequity between the two sex's.]
+]
 ``` {r,warning=FALSE, out.width="50%", fig.width=6, echo=FALSE}
 adult_data %>% ggplot() + geom_density(mapping = aes(x = hours_per_week, colour = sex))
 
